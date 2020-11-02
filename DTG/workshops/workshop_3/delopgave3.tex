@@ -1,0 +1,25 @@
+Lemma 1 i afsnit 5.4.4 i [Ros] siger, at to sorterede lister med $m$ og $n$ elementer kan sammenflettes (merged) til en sorteret liste ved højst $m+n-1$ sammenligninger. 
+
+\subsection{Delopgave 3}
+\subsubsection{Opgave}
+\begin{enumerate}
+	\item Antag at \textsc{Merge} benytter $m+n-1$ sammenligninger til at sammenflette to lister med $m$ og $n$ elementer. Antag yderligere, at $n=2^k$ og vis ved induktion over $k$ (start med $k=0$), at \textsc{Mergesort} bruger præcis
+	\begin{align*}
+		n(\log_2(n)+1)=2^k(k+1)
+	\end{align*}
+	sammenligninger hvis input-listen $L$ har $n=2^k$ elementer. Hvilket slags induktionsbevis brugte du?
+	\item Lav nu et induktionsbevis for, at \textsc{Mergesort} bruger mindre end eller lig med $2n\log_2(n)$ sammenligninger for alle $n\geq 2$ under samme antagelser om \textsc{Merge} som ovenfor. 
+	
+	Hints til opgaven: Vi bliver nødt til at lave induktion over $n$. Bemærk at en liste med $n+1$ elementer deles op i to lister med $\ceil{\frac{n+1}{2}}$ og $\floor{\frac{n+1}{2}}$ elementer i Mergesort. Desuden kan I få brug for følgende vurderinger:
+	\begin{itemize}
+		\item $2\floor{\frac{n+1}{2}}\log_2(\floor{\frac{n+1}{2}})\leq 2\floor{\frac{n+1}{2}}\log_2(\ceil{\frac{n+1}{2}})$
+		\item $\floor{\frac{n+1}{2}}+\ceil{\frac{n+1}{2}}=\frac{n+1}{2}$
+		\item $\ceil{\frac{n+1}{2}}\leq \frac{2}{3}(n+1)$ når $n$ er et positivt heltal
+		\item $\log_2(\frac{2}{3}(n+1))=\log_2(n+1)-\log_2(\frac{3}{2})$
+		\item $n+1-2(n+1)\log_2(\frac{3}{2})<0$ når $n$ er positiv.
+	\end{itemize}	 
+	
+	\item Hvilket slags induktionsbevis brugte du? Og hvad siger resultatet om tidskompleksiteten/store-$O$ for mergesort?
+\end{enumerate}
+
+\subsubsection{Løsning}

@@ -1,0 +1,41 @@
+\section{Workshop 3 - Induktion}
+I denne workshop kigger vi på \textsc{Mergesort}, som er en sorteringsalgoritme. Algoritmen i pseudokode kan ses i Figur \ref{fig:Mergesort} eller i afsnit 5.4.4 i [Ros]. \textsc{Mergesort} benytter \textsc{Merge}, som kan ses i Figur \ref{fig:Merge} eller i afsnit 5.4.4 i [Ros]. Bemærk at den her er beskrevet på en lidt anden måde, men at metoden og tanken bag er den samme. Inden I begynder på selve opgaverne kan I med fordel læse of forstå afsnit 5.4.4. Som algoritmen er beskrevet herunder vil man starte med at kalde \textsc{Mergesort}($L=(a_0,a_1,\ldots,a_{n-1}) $, $0$, $n-1$).
+
+\begin{figure}[h!]
+		\begin{algorithmic}
+		\Procedure{Mergesort}{$L=(a_0,a_1,\ldots,a_{n-1}) $, $l$, $r$}
+		\If{$l<r$} 
+		\State $m=\floor{\frac{r+l}{2}}$
+		\State $\textsc{Mergesort}(L, l, m)$
+		\State $\textsc{Mergesort}(L, m+1, r)$
+		\State $L= \textsc{Merge}(L, l, m,r)$\EndIf
+		\Return $L$
+		\EndProcedure
+	\end{algorithmic}
+	\caption{Mergesort}\label{fig:Mergesort}
+\end{figure}
+
+\begin{figure}[h!]
+		\begin{algorithmic}
+		\Procedure{Merge}{$L,l,m,r$}
+		\State $L_1=L[l,l+1,\ldots,m]$
+		\State $L_2=L[m+1,m+2,\ldots,r]$
+		\State $i=0$
+		\State $j=0$
+			\While{$i<m-l+1$ and $j<r-m$}
+				\If{$L_1[i]\leq L_2[j]$} \State $L[l+i+j]=L_1[i]$\State $i=i+1$
+				\Else ~$L[l+i+j]=L_2[j]$\State $j=j+1$
+				\EndIf
+			\EndWhile
+			\If{$i=m-l+1$} \For{$k=j\ldots r-m-1$}
+							\State$L[l+i+k]=L_2[k]$
+						\EndFor
+			\Else \For{$k=i\ldots m-l$}
+							\State$L[l+j+k]=L_1[k]$
+						\EndFor
+			\EndIf
+			\Return $L$
+		\EndProcedure
+	\end{algorithmic}
+	\caption{Merge}\label{fig:Merge}
+\end{figure}
