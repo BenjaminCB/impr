@@ -1,0 +1,7 @@
+PWD /home/benjamincb/git/notes/DTG/workshops/workshop_3
+INPUT /usr/share/texmf-dist/web2c/texmf.cnf
+INPUT /var/lib/texmf/web2c/pdftex/pdflatex.fmt
+INPUT delopgave1.tex
+OUTPUT delopgave1.log
+INPUT /usr/share/texmf-dist/fonts/map/fontname/texfonts.map
+INPUT /usr/share/texmf-dist/fonts/tfm/public/cm/cmcsc10.tfm
