@@ -27,7 +27,8 @@ int count_num_of_n(int* dice, int n_dice, int n);
 int lower_section(int* dice, int n_dice, int* scoreboard);
 int n_of_a_kind(int* dice, int n_dice, int n_kind);
 int n_in_a_row(int* arr, int start_index, int n);
-int straight(int* dice, int n_dice, int start_num);
+int straight(int* dice, int n_dice, int seq_size);
+int check_straight(int* dice, int index, int seq_size);
 int highest_5(int* dice, int n_dice);
 
 /* compare function prototype */
@@ -46,19 +47,18 @@ int main(void) {
 /* main function for the yatzy program */
 void yatzy(void) {
     int n_dice = 0,
-        scoreboard_size = chance - 1,
+        scoreboard_size = chance + 1,
         upper_score,
         lower_score;
     int scoreboard[scoreboard_size];
     
-    empty_scoreboard(scoreboard, scoreboard_size);
-
     /* get an input greater than or equal to 5 */
     do {
         printf("number of dice\n");
         scanf(" %d", &n_dice);
     } while (n_dice < 5);
 
+    
     /* array with dice rolls */
     int dice[n_dice];
     
@@ -101,6 +101,7 @@ void empty_scoreboard(int* scoreboard, int size) {
     int i;
     for (i = 0; i < size; i++) {
         *(scoreboard + i) = 0;
+        printf("func %d\n", *(scoreboard + i));
     }
 }
 
@@ -182,8 +183,19 @@ int lower_section(int* dice, int n_dice, int* scoreboard) {
     *(scoreboard + four_of_a_kind) = n_of_a_kind(dice, n_dice, 4);
     sum += *(scoreboard + four_of_a_kind);
 
-    *(scoreboard + five_of_a_kind) = n_of_a_kind(dice, n_dice, 5);
+    *(scoreboard + sm_straight) = straight(dice, n_dice, 4);
+    sum += *(scoreboard + sm_straight);
+
+    *(scoreboard + lg_straight) = straight(dice, n_dice, 5);
+    sum += *(scoreboard + lg_straight);
+
+    if (n_of_a_kind(dice, n_dice, 5)) {
+        *(scoreboard + five_of_a_kind) = 50;
+    }
     sum += *(scoreboard + five_of_a_kind);
+
+    *(scoreboard + chance) = highest_5(dice, n_dice);
+    sum += *(scoreboard + chance);
 
     return sum;
 }
@@ -202,8 +214,61 @@ int n_of_a_kind(int* dice, int n_dice, int n) {
         }
     }
 
+    printf("Score; %d\n", res);
+
     return res;
 }
+
+int straight(int* dice, int n_dice, int seq_size) {
+    int res = 0;
+
+    roll_and_print(dice, n_dice);
+    
+    int i;
+    for (i = 0; i <= n_dice - seq_size; i++) {
+        if (check_straight(dice, i, seq_size)) {
+            res = (seq_size - 1) * 10;
+            break;
+        }
+    }
+
+    printf("Score; %d\n", res);
+
+    return res;
+}
+
+int check_straight(int* dice, int index, int seq_size) {
+    int res = 1;
+
+    int i;
+    for (i = index; i < index + seq_size - 1; i++) {
+        if (*(dice + i) != *(dice + i + 1) - 1) {
+            res = 0;
+            break;
+        }
+    }
+
+    return res;
+}
+
+int highest_5(int* dice, int n_dice) {
+    int res = 0;
+     
+    roll_and_print(dice, n_dice);
+
+    qsort(dice, n_dice, sizeof(int), compare); 
+
+    int i;
+    for (i = n_dice - 1; i > n_dice - 6; i--) {
+        res += *(dice + i);
+    }
+
+    printf("Score; %d\n", res);
+
+    return res;
+}
+
+
 
 /* compare function from tutorialspoint.com. 
  * takes a void pointer a and b
