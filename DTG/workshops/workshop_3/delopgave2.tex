@@ -1,6 +1,64 @@
 \subsection{Delopgave 2}
-\subsubsection{Opgave}
-\begin{enumerate}
-	\item Bevis ved hjælp af induktion, at \textsc{Mergesort} returnerer den sorterede liste hvis den får en liste med heltal som input. I beviset antages det, at \textsc{Merge} returnerer en sammenflettet sorteret liste, hvis dellisterne $L[l,l+1,\ldots,m]$ og $L[m+1,m+2,\ldots,r]$ er sorteret.
-\end{enumerate}
-\subsubsection{Løsning}
+\textbf{Task:}  Bevis ved hjælp af induktion, at \textsc{Mergesort} returnerer den sorterede liste hvis den får en liste med heltal som input. I beviset antages det, at \textsc{Merge} returnerer en sammenflettet sorteret liste, hvis dellisterne $L[l,l+1,\ldots,m]$ og $L[m+1,m+2,\ldots,r]$ er sorteret.
+
+\bigskip
+\noindent
+\textbf{Solution:} In the base case we have an array with 1 element when we call mergesort we get the following:
+
+\begin{lstlisting}
+    mergeSort(arr, 0, arr_size - 1);
+\end{lstlisting}
+
+With actual values we get the following.
+
+\begin{lstlisting}
+    mergeSort(arr, 0, 0);
+\end{lstlisting}
+
+in the function we get that $l = 0$ and that $r = 0$ the first thing we check is that $l<r$ Since this is not true an the function doesn't continue and thus the array is sorted which is true. 
+In the case where we have an array size of 2 we split the elements into two arrays with ane element in each, and call mergeSort an each of them. Since both only have one element we return to the original function, and call merge. Merge then gives us the sorted array back.
+
+Induction step:
+We assume that the mergeSort will give us a single sorted list if we give it the following sorted lists: $L[l,l+1,\ldots,m]$ and $L[m+1,m+2,\ldots,r]$ are sorted.
+Now if we have give at an unsorted list with r+1 elements it's going to split it in the middle. And we are going to split those and were going to continue to split until we have to lists with one element in each. We can now start to merge, this will go well until we have $L[l,l+1,\ldots,m]$ and $L[m+1,m+2,\ldots,r, r+1]$ that are sorted.
+In merge we go through we have iterators for each list. Then it compares the element indexed at each element. if the element in the first list is smaller than the second then the first iterator goes up and vice versa.
+
+\begin{lstlisting}
+    while (i < n1 && j < n2) 
+    { 
+        if (L[i] <= R[j]) 
+        { 
+            arr[k] = L[i]; 
+            i++; 
+        } 
+        else
+        { 
+            arr[k] = R[j]; 
+            j++; 
+        } 
+        k++; 
+    } 
+\end{lstlisting}
+
+If last element of the first list is smaller than a r or an element before that we have just append the last list to the list we want. If it turns out that the value at index r+1 is smaller than some value in the first list we will have that r+1 will be the last element put in the bigger list before we append the last values from the first list. 
+
+\begin{lstlisting}
+    /* Copy the remaining elements of L[], if there 
+       are any */
+    while (i < n1) 
+    { 
+        arr[k] = L[i]; 
+        i++; 
+        k++; 
+    } 
+  
+    /* Copy the remaining elements of R[], if there 
+       are any */
+    while (j < n2) 
+    { 
+        arr[k] = R[j]; 
+        j++; 
+        k++; 
+    } 
+\end{lstlisting}
+And thus the original list with r+1 elements is sorted. 

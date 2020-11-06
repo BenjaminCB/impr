@@ -1,17 +1,13 @@
 \subsection{Delopgave 1}
-\subsubsection{Opgave}
-\begin{enumerate}
-	\item Implementer \textsc{Merge} og \textsc{Mergesort}. 
-	\item Brug \textsc{Mergesort} til at sortere listen $L=(5,3,8,1,6,10,7,2,4,9)$
-\end{enumerate}
+\subsubsection{}
+\textbf{Task:} Implementer \textsc{Merge} og \textsc{Mergesort}. 
 
-\subsubsection{Løsning}
-\begin{enumerate}
-    \item Opgave 1
-    Taget fra https://www.geeksforgeeks.org/c-program-for-merge-sort/ fordi den fra moodle på ingen måde gad at virke uanset hvor meget jeg rettede i det. Den er alligevel baseret på næsten en direkt kopi af denne, så det går nok.
-    \begin{lstlisting}
-    #include<stdlib.h> 
-    #include<stdio.h> 
+\bigskip
+\noindent
+\textbf{Solution:} Taget fra https://www.geeksforgeeks.org/c-program-for-merge-sort/ fordi den fra moodle på ingen måde gad at virke uanset hvor meget jeg rettede i det. Den er alligevel baseret på næsten en direkt kopi af denne, så det går nok.
+\begin{lstlisting}
+#include<stdlib.h> 
+#include<stdio.h> 
     
 void merge(int arr[], int l, int m, int r) 
 { 
@@ -105,16 +101,18 @@ int main()
     return 0; 
 } 
 \end{lstlisting}
-    
-    \item Opgave 2
-\begin{lstlisting}
-benjamin@DESKTOP-CNN41EU:~/c_opgaver$ ./mergekopi
-Given array is
-5 3 8 1 6 10 7 2 4 9
-Sorted array is
-1 2 3 4 5 6 7 8 9 10
-\end{lstlisting}
-\end{enumerate}
+\subsubsection{}
+\textbf{Task:} Brug \textsc{Mergesort} til at sortere listen $L=(5,3,8,1,6,10,7,2,4,9)$
+\bigskip
+\noindent
+\textbf{Solution:}
 
+\begin{lstlisting}
+    benjamin@DESKTOP-CNN41EU:~/c_opgaver$ ./mergekopi
+    Given array is
+    5 3 8 1 6 10 7 2 4 9
+    Sorted array is
+    1 2 3 4 5 6 7 8 9 10
+\end{lstlisting}
 
 

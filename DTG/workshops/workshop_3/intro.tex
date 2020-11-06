@@ -2,13 +2,14 @@
 I denne workshop kigger vi på \textsc{Mergesort}, som er en sorteringsalgoritme. Algoritmen i pseudokode kan ses i Figur \ref{fig:Mergesort} eller i afsnit 5.4.4 i [Ros]. \textsc{Mergesort} benytter \textsc{Merge}, som kan ses i Figur \ref{fig:Merge} eller i afsnit 5.4.4 i [Ros]. Bemærk at den her er beskrevet på en lidt anden måde, men at metoden og tanken bag er den samme. Inden I begynder på selve opgaverne kan I med fordel læse of forstå afsnit 5.4.4. Som algoritmen er beskrevet herunder vil man starte med at kalde \textsc{Mergesort}($L=(a_0,a_1,\ldots,a_{n-1}) $, $0$, $n-1$).
 
 \begin{figure}[h!]
-		\begin{algorithmic}
+    \begin{algorithmic}
 		\Procedure{Mergesort}{$L=(a_0,a_1,\ldots,a_{n-1}) $, $l$, $r$}
-		\If{$l<r$} 
-		\State $m=\floor{\frac{r+l}{2}}$
-		\State $\textsc{Mergesort}(L, l, m)$
-		\State $\textsc{Mergesort}(L, m+1, r)$
-		\State $L= \textsc{Merge}(L, l, m,r)$\EndIf
+            \If{$l<r$} 
+                \State $m=\floor{\frac{r+l}{2}}$
+                \State $\textsc{Mergesort}(L, l, m)$
+                \State $\textsc{Mergesort}(L, m+1, r)$
+                \State $L= \textsc{Merge}(L, l, m,r)$
+            \EndIf
 		\Return $L$
 		\EndProcedure
 	\end{algorithmic}
