@@ -19,14 +19,21 @@ sammenligninger hvis input-listen $L$ har $n=2^k$ elementer. Hvilket slags induk
 \end{equation}
 
 \noindent
-Now for the inductive step where where our list has $k+1$ elements. When k goes up by one we double our number of elements. This means that we can split our list L one more time, meaning we will get $1+1+m+n-1$ more comparisons. for $k>0$ we also have that n is even, meaning that $m=n$. We can now make the following expression:
+Now for the inductive step where where our list has $k+1$ elements. When k goes up by one we double our number of elements. This means that when we split our list the first time we get to lists we k elements in each because $2^{k+1}=2\cdot2^k=2^k+2^k$, Merge sort will be called on both of these which we assume will make $2^k(k+1)$ comparisons plus we also call merge which will make $m+n-1$ comparisons. we also nkow that for $k>0$ n is an even number meaning that $m=n$. Lastly when we call mergesort on the original list we make one comparison to see if $l<r$. We can now make the follewing expression.
 
 \begin{equation}
     \begin{aligned}
-    2^{(k+1)}(k+2)=2^k(k+1)+2n+1\\
-    2^{(k+1)}(k+2)=2^k(k+1)+2\cdot2^k+1\\
+        2\cdot2^k(k+1)+2n-1+1\\
+        2\cdot2^k(k+1)+2n\\
+        3\cdot2^k(k+1)+2\cdot2^k\\
+        2^{k+1}(k+1)+2^{k+1}\\
+        2^{k+1}((k+1)+1)\\
+        2^{k+1}(k+2)\\
+        \blacksquare
     \end{aligned}
 \end{equation}
+
+\textbf{We used weak induction on k, but since k is doubling n we might have used string induction on n. This noods to be this needs to be researched a little more.}
 
 \subsubsection{}
 \textbf{Task:} Lav nu et induktionsbevis for, at \textsc{Mergesort} bruger mindre end eller lig med $2n\log_2(n)$ sammenligninger for alle $n\geq 2$ under samme antagelser om \textsc{Merge} som ovenfor. 
@@ -42,11 +49,49 @@ Now for the inductive step where where our list has $k+1$ elements. When k goes 
 
 \bigskip
 \noindent
-\textbf{Solution:} 
+\textbf{Solution:} Base step we have that $n=2$ and we have to show that the following is true:
+
+\begin{equation}
+    \begin{aligned}
+        2(log_2(2)+1)\leq2\cdot2(log_2(2))\\
+        2(1+1)\leq2\cdot(2)\\
+        4\leq4
+    \end{aligned}
+\end{equation}
+
+\noindent
+Now for the inductive step we have to show the following:
+
+\begin{equation}
+    \begin{aligned}
+        (n+1)(log_2(n+1)+1)\leq2(n+1)log_2(n+1)\\
+        (n+1)log_2(n+1)+n+1\leq2(n+1)log_2(n+1)\\
+        n+1\leq(n+1)log_2(n+1)\\
+        \frac{n+1}{n+1}\leq\frac{(n+1)log_2(n+1)}{n+1}\\
+        1\leq log_2(n+1)\\
+        \blacksquare
+    \end{aligned}
+\end{equation}
+
+\noindent
+The last part is true because $n\geq2$
+
 \subsubsection{}
 \textbf{Task:} Hvilket slags induktionsbevis brugte du? Og hvad siger resultatet om tidskompleksiteten/store-$O$ for mergesort?
 
 \bigskip
 \noindent
-\textbf{Solution:} 
+\textbf{Solution:} Weak induction was used. It means that the time complexity is $O(2nlog_2(n))$. We also have that if $f_1$ is $O(x_1)$ and $f_2$ is $O(x_2)$ then $f_1\cdot f_2$ is $O(x_1\cdot x_2)$.
 
+We have the function $2n$ and $log_2(n)$ the latter can't be shortened but the first can. 
+
+\begin{equation}
+    \begin{aligned}
+        |2n|\leq C|n|\\
+        |2n|\leq 3|n|\\
+        (3, 0)
+    \end{aligned}
+\end{equation}
+
+\noindent
+Therefore we get a time complexity of $O(nlog_2(n))$.
