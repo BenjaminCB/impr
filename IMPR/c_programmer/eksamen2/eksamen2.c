@@ -39,14 +39,12 @@ enum rolls{ones, twes, threes, fours, fives, sixes, bonus,
             three_of_a_kind, four_of_a_kind, house, sm_straight, lg_straight, five_of_a_kind, chance};
 
 int main(void) {
-    time_t t;
-    srand((unsigned) time(&t));
-    char answer = 'y';
-    while (answer == 'y') {
-        yatzy(); 
-        printf("Do you want to play again (y/n)\n");
-        scanf("%c", &answer);
-    }
+    //time_t t;
+    //srand((unsigned) time(&t));
+
+
+    yatzy(); 
+
     return 0;
 }
 
@@ -57,7 +55,7 @@ void yatzy(void) {
         upper_score,
         lower_score;
     int scoreboard[scoreboard_size],
-        dice_counter[6];
+        dice_counter[] = {0, 0, 0, 0, 0, 0};
     
     /* get an input greater than or equal to 5 */
     do {
@@ -69,8 +67,8 @@ void yatzy(void) {
     /* array with dice rolls */
     int dice[n_dice];
     
-    upper_score = upper_section(dice, n_dice, scoreboard);
-    lower_score = lower_section(dice, n_dice, scoreboard);
+    upper_score = upper_section(dice, n_dice, dice_counter, scoreboard);
+    lower_score = lower_section(dice, n_dice, dice_counter, scoreboard);
 
     print_scoreboard(scoreboard, upper_score, lower_score);
 }
@@ -101,7 +99,7 @@ void roll_print_count(int* dice, int n_dice, int* dice_counter) {
     roll_multiple_dice(dice, n_dice); 
     printf("Rolled ");
     print_arr(dice, n_dice);  
-    count_dice(dice_counter);
+    count_dice(dice, n_dice, dice_counter);
 }
 
 /* sets all values of the scoreboard to 0 */
@@ -145,7 +143,7 @@ int upper_section(int* dice, int n_dice, int* dice_counter, int* scoreboard) {
     int sum = 0;
 
     int i;
-    for (i = 0; i < 6; i++) {
+    for (i = ones; i <= sixes; i++) {
         roll_print_count(dice, n_dice, dice_counter);
         *(scoreboard + i) = (i + 1) * *(dice_counter + i);   /* calculate the score for a single i.e 1, 2,..,6 and add it to the total */
         sum += (i + 1) * *(dice_counter + i);
@@ -182,15 +180,15 @@ void count_dice(int* dice, int n_dice, int* dice_counter) {
             case 1:
                 *dice_counter++; break;
             case 2:
-                *(dice_counter + 1)++; break;
+                (*(dice_counter + 1))++; break;
             case 3:
-                *(dice_counter + 2)++; break;
+                (*(dice_counter + 2))++; break;
             case 4:
-                *(dice_counter + 3)++; break;
+                (*(dice_counter + 3))++; break;
             case 5:
-                *(dice_counter + 4)++; break;
+                (*(dice_counter + 4))++; break;
             case 6:
-                *(dice_counter + 5)++; break;
+                (*(dice_counter + 5))++; break;
             default:
                 printf("error in switch\n");
         }
@@ -213,7 +211,7 @@ int lower_section(int* dice, int n_dice, int* dice_counter, int* scoreboard) {
     *(scoreboard + lg_straight) = straight(dice, n_dice, dice_counter, 5);
     sum += *(scoreboard + lg_straight);
 
-    if (n_of_a_kind(dice, n_dice, dice_counter 5)) {
+    if (n_of_a_kind(dice, n_dice, dice_counter, 5)) {
         *(scoreboard + five_of_a_kind) = 50;
     }
     sum += *(scoreboard + five_of_a_kind);
