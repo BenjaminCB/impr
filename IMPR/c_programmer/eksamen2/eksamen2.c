@@ -18,29 +18,35 @@ void roll_multiple_dice(int* dice, int n_dice);
 void print_arr(int* dice, int n_dice);
 void empty_scoreboard(int* scoreboard, int size);
 void print_scoreboard(int* scoreboard, int upper_score, int lower_score);
-void roll_and_print(int* dice, int n_dice);
+void roll_print_count(int* dice, int n_dice, int* dice_counter);
 
 /* specific roll prototypes */
-int upper_section(int* dice, int n_dice, int* scoreboard);
-int singles(int* dice, int n_dice, int num);
-int count_num_of_n(int* dice, int n_dice, int n);
-int lower_section(int* dice, int n_dice, int* scoreboard);
-int n_of_a_kind(int* dice, int n_dice, int n_kind);
-int n_in_a_row(int* arr, int start_index, int n);
-int straight(int* dice, int n_dice, int seq_size);
-int check_straight(int* dice, int index, int seq_size);
-int highest_5(int* dice, int n_dice);
+int upper_section(int* dice, int n_dice, int* dice_counter, int* scoreboard);
+/*int singles(int* dice, int n_dice, int num);*/
+void count_dice(int* dice, int n_dice, int* dice_counter);
+int lower_section(int* dice, int n_dice, int* dice_counter, int* scoreboard);
+int n_of_a_kind(int* dice, int n_dice, int* dice_counter, int n_kind);
+int full_house(int* dice, int n_dice, int* dice_counter);
+/*int n_in_a_row(int* arr, int start_index, int n);*/
+int straight(int* dice, int n_dice, int* dice_coutner, int seq_size);
+int check_straight(int* dice_counter, int index, int seq_size);
+int highest_5(int* dice, int n_dice, int* dice_counter);
 
 /* compare function prototype */
 int compare(const void* a, const void* b);
 
 enum rolls{ones, twes, threes, fours, fives, sixes, bonus,
-            three_of_a_kind, four_of_a_kind, full_house, sm_straight, lg_straight, five_of_a_kind, chance};
+            three_of_a_kind, four_of_a_kind, house, sm_straight, lg_straight, five_of_a_kind, chance};
 
 int main(void) {
     time_t t;
     srand((unsigned) time(&t));
-    yatzy(); 
+    char answer = 'y';
+    while (answer == 'y') {
+        yatzy(); 
+        printf("Do you want to play again (y/n)\n");
+        scanf("%c", &answer);
+    }
     return 0;
 }
 
@@ -50,7 +56,8 @@ void yatzy(void) {
         scoreboard_size = chance + 1,
         upper_score,
         lower_score;
-    int scoreboard[scoreboard_size];
+    int scoreboard[scoreboard_size],
+        dice_counter[6];
     
     /* get an input greater than or equal to 5 */
     do {
@@ -90,10 +97,11 @@ void print_arr(int* dice, int n_dice) {
     printf("\n");
 }
 
-void roll_and_print(int* dice, int n_dice) {
+void roll_print_count(int* dice, int n_dice, int* dice_counter) {
     roll_multiple_dice(dice, n_dice); 
     printf("Rolled ");
     print_arr(dice, n_dice);  
+    count_dice(dice_counter);
 }
 
 /* sets all values of the scoreboard to 0 */
@@ -123,7 +131,7 @@ void print_scoreboard(int* scoreboard, int upper_score, int lower_score) {
     printf("Lower Section|       \n");
     printf("3 of a kind  |  %d   \n", *(scoreboard + three_of_a_kind));
     printf("4 of a kind  |  %d   \n", *(scoreboard + four_of_a_kind));
-    printf("Full House   |  %d   \n", *(scoreboard + full_house));
+    printf("Full House   |  %d   \n", *(scoreboard + house));
     printf("Sm Straight  |  %d   \n", *(scoreboard + sm_straight));
     printf("Lg Straight  |  %d   \n", *(scoreboard + lg_straight));
     printf("Yahtzee      |  %d   \n", *(scoreboard + five_of_a_kind));
@@ -133,13 +141,14 @@ void print_scoreboard(int* scoreboard, int upper_score, int lower_score) {
 }
 
 /* rolls all singles and prints the rolls and results */
-int upper_section(int* dice, int n_dice, int* scoreboard) {
+int upper_section(int* dice, int n_dice, int* dice_counter, int* scoreboard) {
     int sum = 0;
 
     int i;
     for (i = 0; i < 6; i++) {
-        *(scoreboard + i) = singles(dice, n_dice, i + 1);   /* calculate the score for a single i.e 1, 2,..,6 and add it to the total */
-        sum += *(scoreboard + i);
+        roll_print_count(dice, n_dice, dice_counter);
+        *(scoreboard + i) = (i + 1) * *(dice_counter + i);   /* calculate the score for a single i.e 1, 2,..,6 and add it to the total */
+        sum += (i + 1) * *(dice_counter + i);
         printf("Score: %d\n", *(scoreboard + i));        
     }
 
@@ -152,65 +161,79 @@ int upper_section(int* dice, int n_dice, int* scoreboard) {
 }
 
 /* take an array, size of the array and a number to look for as input. it then finds all instances of that number and returns the sum */
+/*
 int singles(int* dice, int n_dice, int num) {
-    roll_and_print(dice, n_dice);
+    roll_print_count(dice, n_dice);
     
     qsort(dice, n_dice, sizeof(int), compare);
 
     return num * count_num_of_n(dice, n_dice, num);
 }
+*/
 
-int count_num_of_n(int* dice, int n_dice, int n) {
-    int res = 0,
-        i = 0;
-    while (*(dice + i) != n && i < n_dice) {
-        i++;
+void count_dice(int* dice, int n_dice, int* dice_counter) {
+    int i;
+    for (i = 0; i <= 5; i++) {
+        *(dice_counter + i) = 0;
     }
-    
-    while (*(dice + i) == n && i < n_dice) {
-        res++;
-        i++;
+
+    for (i = 0; i < n_dice; i++) {
+        switch (*(dice + i)) {
+            case 1:
+                *dice_counter++; break;
+            case 2:
+                *(dice_counter + 1)++; break;
+            case 3:
+                *(dice_counter + 2)++; break;
+            case 4:
+                *(dice_counter + 3)++; break;
+            case 5:
+                *(dice_counter + 4)++; break;
+            case 6:
+                *(dice_counter + 5)++; break;
+            default:
+                printf("error in switch\n");
+        }
     }
-    
-    return res;
 }
 
-int lower_section(int* dice, int n_dice, int* scoreboard) {
+int lower_section(int* dice, int n_dice, int* dice_counter, int* scoreboard) {
     int sum = 0;
-    *(scoreboard + three_of_a_kind) = n_of_a_kind(dice, n_dice, 3);
+    *(scoreboard + three_of_a_kind) = n_of_a_kind(dice, n_dice, dice_counter, 3);
     sum += *(scoreboard + three_of_a_kind);
 
-    *(scoreboard + four_of_a_kind) = n_of_a_kind(dice, n_dice, 4);
+    *(scoreboard + four_of_a_kind) = n_of_a_kind(dice, n_dice, dice_counter, 4);
     sum += *(scoreboard + four_of_a_kind);
 
-    *(scoreboard + sm_straight) = straight(dice, n_dice, 4);
+    *(scoreboard + house) =  full_house(dice, n_dice, dice_counter);
+
+    *(scoreboard + sm_straight) = straight(dice, n_dice, dice_counter, 4);
     sum += *(scoreboard + sm_straight);
 
-    *(scoreboard + lg_straight) = straight(dice, n_dice, 5);
+    *(scoreboard + lg_straight) = straight(dice, n_dice, dice_counter, 5);
     sum += *(scoreboard + lg_straight);
 
-    if (n_of_a_kind(dice, n_dice, 5)) {
+    if (n_of_a_kind(dice, n_dice, dice_counter 5)) {
         *(scoreboard + five_of_a_kind) = 50;
     }
     sum += *(scoreboard + five_of_a_kind);
 
-    *(scoreboard + chance) = highest_5(dice, n_dice);
+    *(scoreboard + chance) = highest_5(dice, n_dice, dice_counter);
     sum += *(scoreboard + chance);
 
     return sum;
 }
 
-int n_of_a_kind(int* dice, int n_dice, int n) {
+int n_of_a_kind(int* dice, int n_dice, int* dice_counter, int n) {
     int res = 0;
 
-    roll_and_print(dice, n_dice);
-
-    qsort(dice, n_dice, sizeof(int), compare); 
+    roll_print_count(dice, n_dice, dice_counter);
 
     int i;
-    for (i = 1; i <= 6; i++) {
-        if (n <= count_num_of_n(dice, n_dice, i)) {
-            res = n * i;
+    for (i = 5; i >= 0; i--) {
+        if (n <= *(dice_counter + i)) {
+            res = n * (i + i);
+            break;
         }
     }
 
@@ -219,14 +242,38 @@ int n_of_a_kind(int* dice, int n_dice, int n) {
     return res;
 }
 
-int straight(int* dice, int n_dice, int seq_size) {
+int full_house(int* dice, int n_dice, int* dice_counter) {
+    int res = 0,
+        triple_taken = 0,
+        double_taken = 0;
+
+    roll_print_count(dice, n_dice, dice_counter);
+
+    int i;
+    for (i = 0; i <= 5; i++) {
+        if (*(dice_counter + i) == 3 && !triple_taken) {
+           triple_taken++; 
+        } else if ((*dice_counter + i) == 2 && !double_taken) {
+            double_taken++;
+        }
+
+        if (triple_taken && double_taken) {
+            res = 25;
+            break;
+        }
+    }
+
+    return res;
+}
+
+int straight(int* dice, int n_dice, int* dice_counter, int seq_size) {
     int res = 0;
 
-    roll_and_print(dice, n_dice);
-    
+    roll_print_count(dice, n_dice, dice_counter);
+
     int i;
-    for (i = 0; i <= n_dice - seq_size; i++) {
-        if (check_straight(dice, i, seq_size)) {
+    for (i = 0; i <= 6 - seq_size; i++) {
+        if (check_straight(dice_counter, i, seq_size)) {
             res = (seq_size - 1) * 10;
             break;
         }
@@ -237,12 +284,12 @@ int straight(int* dice, int n_dice, int seq_size) {
     return res;
 }
 
-int check_straight(int* dice, int index, int seq_size) {
+int check_straight(int* dice_counter, int index, int seq_size) {
     int res = 1;
 
     int i;
     for (i = index; i < index + seq_size - 1; i++) {
-        if (*(dice + i) != *(dice + i + 1) - 1) {
+        if (!*(dice_counter + i)) {
             res = 0;
             break;
         }
@@ -251,16 +298,21 @@ int check_straight(int* dice, int index, int seq_size) {
     return res;
 }
 
-int highest_5(int* dice, int n_dice) {
-    int res = 0;
+int highest_5(int* dice, int n_dice, int* dice_counter) {
+    int res = 0,
+        dice_left = 5;
      
-    roll_and_print(dice, n_dice);
-
-    qsort(dice, n_dice, sizeof(int), compare); 
+    roll_print_count(dice, n_dice, dice_counter);
 
     int i;
-    for (i = n_dice - 1; i > n_dice - 6; i--) {
-        res += *(dice + i);
+    for (i = 5; i >= 0; i--) {
+        if (*(dice_counter + i) >= dice_left) {
+            res += (i + 1) * dice_left;
+            break;
+        } else {
+            res += (i + 1) * *(dice_counter + i);
+            dice_left -= *(dice_counter + i);
+        }
     }
 
     printf("Score; %d\n", res);

@@ -1,0 +1,3 @@
+- Could have jest returned triple_taken && double_taken in the full house function. It would be a smarter solution but it wouldn't be in the same style as the function that return the score
+- could probably have used padding on the score board to make it look better
+- could use fgets to make the input easier to handle when the user doesn't do the corret thing.
