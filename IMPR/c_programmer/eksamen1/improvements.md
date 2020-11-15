@@ -1,1 +1,2 @@
 - could use getchar function until EOF to make sure that stdin is empty. This way you won't have overflow from the last input over to the next one.
+- implement response() from eksamen 2

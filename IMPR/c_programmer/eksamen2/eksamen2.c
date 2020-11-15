@@ -3,7 +3,11 @@
  * Gruppe: A306
  * Studieretning: Datalogi */
 
-/* the program uses a compare function from tutorialspoint.com to make use of qsort. The function is described in greater detail just above the definition of it */
+/* i had some trouble emptying stdin i tried looking for the EOF but didn't realize that newline is the character \n so so i would never reach it. 
+ * I found a solution on https://www.thecodingforums.com/threads/peek-at-stdin-flush-stdin.318260/ which is very sumilar to what i did originally but know i also look for newlines.
+ * I have modified the solution a bit, but the response function is highly inspired by that solution.*/
+
+/*the program follows this scoreboard https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fimages1.fanpop.com%2Fimages%2Fphotos%2F1300000%2FYahtzee-board-games-1319734-825-955.jpg&f=1&nofb=1 */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -11,6 +15,8 @@
 
 /* main yatzy function prototype */
 void yatzy(void);
+int response(void);
+void empty_stdin(void);
 
 /* basic function prototypes */
 int roll_die(void);
@@ -36,8 +42,46 @@ enum rolls{ones, twos, threes, fours, fives, sixes, bonus,
 int main(void) {
     time_t t;
     srand((unsigned) time(&t)); /*get a seed based on time*/
-    yatzy(); /*start a game of yatzy*/
+    do {
+        yatzy(); /*start a game of yatzy*/
+    } while (response());
     return 0;
+}
+
+/* get a response from the user and return 1 for yes and 0 for no */
+int response(void) {
+    int res,            /*result of the function this a boolean*/
+        answer;         /*this is the user input*/
+    
+    /*get user input and throw away the rest*/
+    printf("Do you want to play again (y/n); ");
+    answer = getchar(); 
+    empty_stdin();
+    
+    /*check the answer and act accordingly*/
+    switch (answer) {
+        case 'y':
+            res = 1; break;
+        case 'n':
+            res = 0; break;
+        case EOF:
+            res = 0; printf("Reached EOF. Exiting program\n"); break;
+        default:
+            res = 0; printf("You didn't enter (y/n) i'll assume you want to exit\n"); break;
+            
+    }
+
+    return res;
+}
+
+/* empties stdin for extra character that can affect the next user inputs */
+void empty_stdin(void) {
+    char c = getchar();
+
+    /* until a newline charactor or EOF is reached keeping reading characters from stdin */
+    while (c != '\n' && c != EOF) {
+        c = getchar();
+    }
 }
 
 /* main function for the yatzy program */
@@ -55,10 +99,11 @@ void yatzy(void) {
         scanf(" %d", &n_dice);
     } while (n_dice < 5);
 
+    empty_stdin();
     
     /* array with dice rolls */
-    int dice[n_dice];                   /*array with all the rolls*/
-    
+    int dice[n_dice];     
+
     /*do calculate all the rolls and scores*/
     upper_score = upper_section(dice, n_dice, dice_counter, scoreboard);
     lower_score = lower_section(dice, n_dice, dice_counter, scoreboard);
@@ -169,6 +214,8 @@ int upper_section(int* dice, int n_dice, int* dice_counter, int* scoreboard) {
     if (sum >= 63) {
         *(scoreboard + bonus) = 35;
         sum += 35;
+    } else {
+        *(scoreboard + bonus) = 0;
     }
 
     return sum;
@@ -200,6 +247,8 @@ int lower_section(int* dice, int n_dice, int* dice_counter, int* scoreboard) {
     /*check for 5 of a kind if we have that set the scoreboard value to 50 since yatzy has a fixed score*/
     if (n_of_a_kind(dice, n_dice, dice_counter, 5)) {
         *(scoreboard + five_of_a_kind) = 50;
+    } else {
+        *(scoreboard + five_of_a_kind) = 0;
     }
     sum += *(scoreboard + five_of_a_kind);
 
