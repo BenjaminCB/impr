@@ -3,3 +3,4 @@
 - could use fgets to make the input easier to handle when the user doesn't do the corret thing.
 - c90 forbids variable lenght arrays like dice[n_dice]
 - personally i like having loop variables right before the loop but i have tried to follow pedantic rules c90 so for the most part every variable is at the top of the block
+- should use malloc to initalize dice array
