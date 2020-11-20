@@ -1,0 +1,24 @@
+I dette dokument beskrives rammerne for eksamensopgaver i Imperativ Programmering.
+
+Formålet med eksamensopgaverne er at skabe et individuelt udgangspunkt for den mundtlige eksamen. Formålet er endvidere at fremme de studerendes forståelse af imperativ programmering gennem konstruktion af større programmer end de programmer, der arbejdes med i kursets øvelsesgange.
+
+Den mundlige eksamen vil forløbe som en samtale om et afleveret program, og i forlængelse af dette, en eksamination i forhold til kursets målsætninger. Eksamenpræstationen evalueres ud fra de målbeskrivelser og vurderingskriterier, som er fastsat i gældede studieordning. Vurderingerne foretages ud fra det indtryk, som tilvejebringes i den mundtlige eksamen, dels ved diskussion af det afleverede program, dels ved eksamination i kursets pensum.
+
+Følgende regler gælder:
+
+    Programmet skal udarbejdes individuelt.
+    Programmet skal skrives i C. Det vil være mest naturligt at skrive programmet i ANSI C89 (C90). Hvis du vælger at skrive programmet i en anden variant af C skal du kunne gøre rede for forskellene mellem den valgte variant af C og ANSI C89.
+    Kildeprogrammet afleveres elektronisk, via internettet, på samme måde som afleveringsopgaverne på kurset. Det afleverede program skal - af praktiske årsager - have form som én C kildefil. I en programkommentar, øverst i kildefilen, skal du angive dit fulde navn, email adresse, gruppe og studieretning (datalogi/software/interaktionsdesign).
+    Enhver form for hjælp fra medstuderende, ressourcer på internettet, og tilsvarende, som direkte har påvirket det afleverede program, skal angives og beskrives i forbindelse med afleveringen. Angiv dette i en programkommentar, under kommentaren med dit navn mv.
+
+Det OK at anvende danske navne på variable og funktioner. Undgå dog, som sædvanlig i C programmering, brugen af danske bogstaver (æ, ø, å, Æ, Ø og Å) i variabelnavne og funktionsnavne.
+
+Når dit program skal vurderes vil der blive lagt vægt på følgende egenskaber:
+
+    Læsbarhed og forståelighed, herunder god og klar programopstilling (indrykning mv.) samt passende anvendelse af programkommentarer (jf. undervisning og diskussion i kurset).
+    God navngivning af variable, parametre og funktioner, der afspejler den rolle som navnene spiller i programmet.
+    God nedbrydning af problemløsningen i et passende antal korte og overskuelige funktioner, som følge af top-down programmering ved trinvis forfinelse.
+    God parametrisering af funktionerne, således at alt input til en funktion foregår gennem input parametre, og at output fra en funktionen formidles gennem returværdien eller output parametre.
+    Fravær af globale variable.
+    Valg af hensigtsmæssige datastrukturer (structs og arrays).
+    Hensigtsmæssig anvendelse af funktioner fra C Standard Libraries.
