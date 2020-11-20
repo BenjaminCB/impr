@@ -17,6 +17,11 @@ Hold-arrayet skal nu sorteres, så vi kan finde stillingen i turneringen efter 2
 Gør dig umage med at udskrive stillingen pænt, med fire lige brede søjler der er indrykket på en naturlig og overskuelig måde.*/
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+
+
+#define NUMBER_OF_MATCHES 182
+#define NUMBER_OF_TEAMS 14
 
 typedef enum weekday {
     Manday = 0,
@@ -37,17 +42,77 @@ typedef struct time {
 } Time;
 
 typedef struct match {
-    Weekday day;
+    char day[3];
     Date date;
     Time time;
     char home_team[3];
     int home_team_goals;
     char away_team[3];
     int away_team_goals;
-    int attendes;
+    int attendees;
 } Match;
 
-int main(void) {
+typedef struct team {
+    char name[3];
+    int points, goals_scored, goals_scored_against;
+} Team;
 
+typedef struct table {
+    int index, key;
+} Table;
+
+void read_stats(Match* matches, Team* teams);
+void print_match(Match* match);
+void evaluate_match(Match* match, Team* teams);
+int find_team_index(Team* teams, char* team_name);
+
+int main(void) {
+    Match matches[NUMBER_OF_MATCHES];
+    Team teams[NUMBER_OF_TEAMS];
+    read_stats(matches, teams);
+    int i;
+    for (i = 0; i < NUMBER_OF_MATCHES; i++) {
+        print_match((matches + i));
+    }
     return 0;
+}
+
+void read_stats(Match* matches, Team* teams) {
+    FILE* match_stats = fopen("kampe-2019-2020.txt", "r");
+    int i;
+    for (i = 0; i < NUMBER_OF_MATCHES; i++) {
+        fscanf(match_stats, "%s %d/%d %d.%d %s - %s %d - %d %d",
+                (matches + i)->day,
+                &(matches + i)->date.day, &(matches + i)->date.month,
+                &(matches + i)->time.hours, &(matches + i)->time.minutes,
+                (matches + i)->home_team, (matches + i)->away_team,
+                &(matches + i)->home_team_goals, &(matches + i)->away_team_goals, 
+                &(matches + i)->attendees); 
+        evaluate_match((matches + i, teams));
+    }
+}
+
+void print_match(Match* match) {
+    printf("%s %d/%d %d.%d %s - %s %d - %d %d\n",
+            match->day,
+            match->date.day, match->date.month,
+            match->time.hours, match->time.minutes,
+            match->home_team, match->away_team,
+            match->home_team_goals, match->away_team_goals, 
+            match->attendees);
+}
+
+void evaluate_match(Match* match, Team* teams) {
+    int home_team index = find_team_index(teams, match->home_team);
+    int away_team_index = find_team_index(teams, match->away_team);
+}
+
+int find_team_index(Team* teams, char* team_name) {
+    int i = 0;
+    for (;;) {
+        if (strcmp((teams + i)->name, team_name) == 0 || (teams + i)->name == NULL) {
+            return i;
+        }
+        i++;
+    }
 }
