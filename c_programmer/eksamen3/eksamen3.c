@@ -19,7 +19,6 @@ Gør dig umage med at udskrive stillingen pænt, med fire lige brede søjler der
 #include <stdio.h>
 #include <string.h>
 
-
 #define NUMBER_OF_MATCHES 182
 #define NUMBER_OF_TEAMS 14
 
@@ -57,27 +56,31 @@ typedef struct team {
     int points, goals_scored, goals_scored_against;
 } Team;
 
-typedef struct table {
-    int index, key;
-} Table;
+typedef struct list {
+    Team* team;
+    struct list* next;
+} List;
 
-void read_stats(Match* matches, Team* teams);
+void read_stats(Match* matches, List* teams);
 void print_match(Match* match);
-void evaluate_match(Match* match, Team* teams);
-int find_team_index(Team* teams, char* team_name);
+void print_team(Team* team);
+void evaluate_match(Match* match, List* teams);
+Team* lookup(List* teams, char* team_name);
+int hash(char* str);
+Team* insert(List* chain, char* team_name);
 
 int main(void) {
     Match matches[NUMBER_OF_MATCHES];
-    Team teams[NUMBER_OF_TEAMS];
+    List teams[NUMBER_OF_TEAMS];
     read_stats(matches, teams);
     int i;
-    for (i = 0; i < NUMBER_OF_MATCHES; i++) {
-        print_match((matches + i));
+    for (i = 0; i < NUMBER_OF_TEAMS; i++) {
+        print_team((teams + i)->team);
     }
     return 0;
 }
 
-void read_stats(Match* matches, Team* teams) {
+void read_stats(Match* matches, List* teams) {
     FILE* match_stats = fopen("kampe-2019-2020.txt", "r");
     int i;
     for (i = 0; i < NUMBER_OF_MATCHES; i++) {
@@ -88,7 +91,7 @@ void read_stats(Match* matches, Team* teams) {
                 (matches + i)->home_team, (matches + i)->away_team,
                 &(matches + i)->home_team_goals, &(matches + i)->away_team_goals, 
                 &(matches + i)->attendees); 
-        evaluate_match((matches + i, teams));
+        evaluate_match((matches + i), teams);
     }
 }
 
@@ -102,17 +105,63 @@ void print_match(Match* match) {
             match->attendees);
 }
 
-void evaluate_match(Match* match, Team* teams) {
-    int home_team index = find_team_index(teams, match->home_team);
-    int away_team_index = find_team_index(teams, match->away_team);
+void print_team(Team* team) {
+    printf("%s %d %d %d",
+            team->name,
+            team->points,
+            team->goals_scored,
+            team->goals_scored_against);
 }
 
-int find_team_index(Team* teams, char* team_name) {
-    int i = 0;
-    for (;;) {
-        if (strcmp((teams + i)->name, team_name) == 0 || (teams + i)->name == NULL) {
-            return i;
+void evaluate_match(Match* match, List* teams) {
+    Team* home_team = lookup(teams, match->home_team);
+    Team* away_team = lookup(teams, match->away_team);
+
+    home_team->goals_scored += match->home_team_goals;
+    home_team->goals_scored_against += match->away_team_goals;
+    
+    away_team->goals_scored += match->away_team_goals;
+    away_team->goals_scored_against += match->home_team_goals;
+
+    if (home_team->goals_scored < away_team->goals_scored) {
+        away_team->points += 3;
+    } else if (home_team->goals_scored > away_team->goals_scored) {
+        home_team->points += 3;
+    } else {
+        away_team->points++;
+        home_team->points++;
+    }
+}
+
+Team* lookup(List* teams, char* team_name) {
+    int index = hash(team_name);
+    List* chain = (teams + index);
+    while (chain != NULL) {
+        if (strcmp(chain->team->name, team_name)) {
+             return chain->team;
+        } else {
+            chain = chain->next;
         }
+    }
+    return insert(chain, team_name);
+}
+
+int hash(char* str) {
+    int sum = 0,
+        i = 0;
+    while (str[i] != '\0') {
+        sum += (int) str[i];
         i++;
     }
+    return sum % NUMBER_OF_TEAMS;
+}
+
+Team* insert(List* chain, char* team_name) {
+    List* new_team = (List*) malloc(sizeof(List));
+    chain = new_team;
+    strcpy(new_team->team->name, team_name);
+    new_team->team->goals_scored = 0;
+    new_team->team->goals_scored_against = 0;
+    new_team->team->points = 0;
+    return new_team->team;
 }
