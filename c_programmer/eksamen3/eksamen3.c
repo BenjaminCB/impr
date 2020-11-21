@@ -63,20 +63,44 @@ typedef struct list {
 
 void read_stats(Match* matches, List* teams);
 void print_match(Match* match);
-void print_team(Team* team);
+void print_team(Team* team, int h);
 void evaluate_match(Match* match, List* teams);
 Team* lookup(List* teams, char* team_name);
 int hash(char* str);
-Team* insert(List* chain, char* team_name);
+List* insert(List* last, char* team_name);
 
 int main(void) {
     Match matches[NUMBER_OF_MATCHES];
     List teams[NUMBER_OF_TEAMS];
-    read_stats(matches, teams);
     int i;
+
     for (i = 0; i < NUMBER_OF_TEAMS; i++) {
-        print_team((teams + i)->team);
+        teams[i].next = NULL;
     }
+
+    read_stats(matches, teams);
+
+    for (i = 0; i < NUMBER_OF_TEAMS; i++) {
+        int h = 0;
+        List* j = (teams + i);
+        if (j == NULL) printf("yep\n");
+        while (j != NULL) {
+            print_team(j->team, h);
+            j = j->next;
+            h++;
+        }
+        /*if (j->team != NULL) {
+            print_team(j->team, h);
+        }*/
+    }
+
+    /*int h = 0;
+    while(teams[2] != NULL) {
+        print_team(teams[2]->team, h);
+        teams[2] = teams[2]->next;
+        h++;
+    }*/
+
     return 0;
 }
 
@@ -105,12 +129,13 @@ void print_match(Match* match) {
             match->attendees);
 }
 
-void print_team(Team* team) {
-    printf("%s %d %d %d",
+void print_team(Team* team, int h) {
+    printf("%s %d %d %d %d\n",
             team->name,
             team->points,
             team->goals_scored,
-            team->goals_scored_against);
+            team->goals_scored_against,
+            h);
 }
 
 void evaluate_match(Match* match, List* teams) {
@@ -136,14 +161,17 @@ void evaluate_match(Match* match, List* teams) {
 Team* lookup(List* teams, char* team_name) {
     int index = hash(team_name);
     List* chain = (teams + index);
-    while (chain != NULL) {
-        if (strcmp(chain->team->name, team_name)) {
-             return chain->team;
+
+    while (chain->next != NULL) {
+        if (!strcmp((chain)->team->name, team_name)) {
+            return (chain)->team;
         } else {
-            chain = chain->next;
+            (chain) = (chain)->next;
         }
     }
-    return insert(chain, team_name);
+
+    chain->next = insert(chain, team_name);
+    return chain->next->team;
 }
 
 int hash(char* str) {
@@ -156,12 +184,20 @@ int hash(char* str) {
     return sum % NUMBER_OF_TEAMS;
 }
 
-Team* insert(List* chain, char* team_name) {
-    List* new_team = (List*) malloc(sizeof(List));
-    chain = new_team;
-    strcpy(new_team->team->name, team_name);
-    new_team->team->goals_scored = 0;
-    new_team->team->goals_scored_against = 0;
-    new_team->team->points = 0;
-    return new_team->team;
+List* insert(List* last, char* team_name) {
+    /*List* next_node = (List*) malloc(sizeof(List));
+    chain->next = next_node;*/
+    last = (List*) malloc(sizeof(List));
+    (last)->team = (Team*) malloc(sizeof(Team));
+
+    strcpy((last)->team->name, team_name);
+    (last)->team->goals_scored = 0;
+    (last)->team->goals_scored_against = 0;
+    (last)->team->points = 0;
+    (last)->next = NULL;
+
+    /*next_node->next = NULL;
+    next_node->team = NULL;*/
+
+    return (last);
 }
