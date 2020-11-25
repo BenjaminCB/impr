@@ -61,27 +61,30 @@ typedef struct list {
     struct list* next;
 } List;
 
-void read_stats(Match* matches, Team* teams);
+void read_stats(Match* matches, List* teams);
 void print_match(Match* match);
 void print_team(Team* team);
-void evaluate_match(Match* match, Team* teams);
+void evaluate_match(Match* match, List* teams);
 Team* lookup(Team* teams, char* team_name);
 int hash(char* str);
+Team* list_lookup(List* teams, char* team_name);
 List* insert(List* last, char* team_name);
 
 int main(void) {
     Match matches[NUMBER_OF_MATCHES];
     Team teams[NUMBER_OF_TEAMS];
+    List list_teams[NUMBER_OF_TEAMS];
     int i;
 
     for (i = 0; i < NUMBER_OF_TEAMS; i++) {
+        list_teams[i].next = NULL;
         teams[i].name[0] = '\0';
     }
 
-    read_stats(matches, teams);
+    read_stats(matches, list_teams);
 
-    for (i = 0; i < NUMBER_OF_TEAMS; i++) {
-        /*int h = 0;
+    /*for (i = 0; i < NUMBER_OF_TEAMS; i++) {
+        [>int h = 0;
         List* j = (teams + i);
         if (j == NULL) printf("yep\n");
         while (j != NULL) {
@@ -91,21 +94,21 @@ int main(void) {
         }
         [>if (j->team != NULL) {
             print_team(j->team, h);
-        }<]*/
+        }<]<]
         print_team((teams + i));
-    }
-
-    /*int h = 0;
-    while(teams[2] != NULL) {
-        print_team(teams[2]->team, h);
-        teams[2] = teams[2]->next;
-        h++;
     }*/
+    for (i = 0; i < NUMBER_OF_TEAMS; i++) {
+        List* p = list_teams + i;
+        while(p->next != NULL) {
+            print_team(p->team);
+            p = p->next;
+        }
+    }
 
     return 0;
 }
 
-void read_stats(Match* matches, Team* teams) {
+void read_stats(Match* matches, List* teams) {
     FILE* match_stats = fopen("kampe-2019-2020.txt", "r");
     int i;
     for (i = 0; i < NUMBER_OF_MATCHES; i++) {
@@ -131,16 +134,16 @@ void print_match(Match* match) {
 }
 
 void print_team(Team* team) {
-    printf("%s %d %d %d\n",
+    printf("%4s %4d %4d %4d\n",
             team->name,
             team->points,
             team->goals_scored,
             team->goals_scored_against);
 }
 
-void evaluate_match(Match* match, Team* teams) {
-    Team* home_team = lookup(teams, match->home_team);
-    Team* away_team = lookup(teams, match->away_team);
+void evaluate_match(Match* match, List* teams) {
+    Team* home_team = list_lookup(teams, match->home_team);
+    Team* away_team = list_lookup(teams, match->away_team);
 
     home_team->goals_scored += match->home_team_goals;
     home_team->goals_scored_against += match->away_team_goals;
@@ -148,9 +151,9 @@ void evaluate_match(Match* match, Team* teams) {
     away_team->goals_scored += match->away_team_goals;
     away_team->goals_scored_against += match->home_team_goals;
 
-    if (home_team->goals_scored < away_team->goals_scored) {
+    if (match->home_team_goals < match->away_team_goals) {
         away_team->points += 3;
-    } else if (home_team->goals_scored > away_team->goals_scored) {
+    } else if (match->home_team_goals > match->away_team_goals) {
         home_team->points += 3;
     } else {
         away_team->points++;
@@ -161,7 +164,7 @@ void evaluate_match(Match* match, Team* teams) {
 Team* lookup(Team* teams, char* team_name) {
     int index = hash(team_name);
 
-    while ((teams + index)->name[0] != '\0') {
+    while (*((teams + index)->name) != '\0') {
         if (!strcmp((teams + index)->name, team_name)) {
             return (teams + index);
         } else {
@@ -174,18 +177,21 @@ Team* lookup(Team* teams, char* team_name) {
     (teams + index)->goals_scored_against = 0;
     (teams + index)->points = 0;
     return (teams + index);
-    /*List* chain = (teams + index);
+}
+
+Team* list_lookup(List* teams, char* team_name) {
+    int index = hash(team_name);
+    List* chain = (teams + index);
 
     while (chain->next != NULL) {
-        if (!strcmp((chain)->team->name, team_name)) {
-            return (chain)->team;
+        if (!strcmp(chain->team->name, team_name)) {
+            return chain->team;
         } else {
-            (chain) = (chain)->next;
+            chain = chain->next;
         }
     }
-
     chain->next = insert(chain, team_name);
-    return chain->next->team;*/
+    return chain->team;
 }
 
 int hash(char* str) {
@@ -201,17 +207,17 @@ int hash(char* str) {
 List* insert(List* last, char* team_name) {
     /*List* next_node = (List*) malloc(sizeof(List));
     chain->next = next_node;*/
-    last = (List*) malloc(sizeof(List));
-    (last)->team = (Team*) malloc(sizeof(Team));
+    last->next = (List*) malloc(sizeof(List));
+    last->team = (Team*) malloc(sizeof(Team));
 
-    strcpy((last)->team->name, team_name);
-    (last)->team->goals_scored = 0;
-    (last)->team->goals_scored_against = 0;
-    (last)->team->points = 0;
-    (last)->next = NULL;
+    strcpy(last->team->name, team_name);
+    last->team->goals_scored = 0;
+    last->team->goals_scored_against = 0;
+    last->team->points = 0;
+    last->next->next = NULL;
 
     /*next_node->next = NULL;
     next_node->team = NULL;*/
 
-    return (last);
+    return last->next;
 }
