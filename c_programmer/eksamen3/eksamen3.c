@@ -1,36 +1,9 @@
-/*De generelle regler for udarbejdelse og aflevering af opgaven er beskrevet i Rammer for eksamensopgaver i Imperativ Programmering.
-
-Denne opgave er baseret på en fil med resultaterne fra de første 26 runder af den danske superliga fra 2019-2020. Navnet på din inputfil skal være kampe-2019-2020.txt. Hver linje i filen er et kampresultat, eksempelvis
-
-      Fre     12/07 19.00     FCM - EFB     1 - 0     7310
-
-Denne linje betyder at FCM (FC Midtjylland) har spillet på hjemmebane mod EFB (Esbjerg FB) fredag 12. juli kl. 19.00, kampen blev overværet af 7310 tilskuere, FCM scorede et mål og EFB scorede ikke i kampen.
-
-I opgaven skal samtlige kampe indlæses i et array af structs (kamp-arrayet). Hvis du ønsker det kan du antage at der netop er 182 kampe i turneringen. Det benyttede struct skal opbevare oplysninger om kampens ugedag, dato (uden årstal), klokkeslæt, de to hold, kampens resultat og tilskuertal.
-
-Opgaven går nu ud på at gennemløbe alle kampresultater med henblik på at lave et array af hold (hold-arrayet), hvor et hold er en struct. Hold structen skal indholde holdnavn, point, antal mål scoret af holdet og antal mål score mod holdet. Hvis du ønsker det kan du antage at der netop er 14 hold som spiller i turneringen. Hold-arrayet kan opfattes som et associativt array, der associererer holdnavnet med et hold struct, og derfor kan dele af opgaven om associative arrays bruges i denne opgave. Hvis du ønsker det kan du placere holdene på faste, forudprogrammerede pladser i hold-arrayet.
-
-Hold-arrayet skal nu sorteres, så vi kan finde stillingen i turneringen efter 26 runder. I denne opgave sorteres primært efter point og sekundært efter målforskel. En vundet kamp giver 3 point, en uafgjort kamp giver 1 point, og en tabt kamp giver ingen point. Udskriv stillingen af turneringen på standard output med én linje per hold i følgende format:
-
-       Holdnavn Point Mål-af-hold Mål-mod-hold
-
-Gør dig umage med at udskrive stillingen pænt, med fire lige brede søjler der er indrykket på en naturlig og overskuelig måde.*/
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
 #define NUMBER_OF_MATCHES 182
 #define NUMBER_OF_TEAMS 14
-
-typedef enum weekday {
-    Manday = 0,
-    Tuesday,
-    Wednesday,
-    Thursday,
-    Friday,
-    Saturday,
-    Sunday
-} Weekday;
 
 typedef struct date {
     int day, month;
@@ -41,47 +14,61 @@ typedef struct time {
 } Time;
 
 typedef struct match {
-    char day[3];
-    Date date;
-    Time time;
-    char home_team[3];
-    int home_team_goals;
-    char away_team[3];
-    int away_team_goals;
-    int attendees;
+    char day[3];                /*Shortened version for the day of the week*/
+    Date date;                  /*struct for day, month and year*/
+    Time time;                  /*struct for hours and minutes*/
+    char home_team[3];          /*shortened name for the home team*/
+    int home_team_goals;        /*the amount of goals that the home team got in the match*/
+    char away_team[3];          /*shortened name for the away team*/
+    int away_team_goals;        /*the amount of goals that the away team got in the match*/
+    int attendees;              /*the amount of attendees at the match*/
 } Match;
 
+/* team struct which has the following
+ * shortened name for the team
+ * total amount of points for the season
+ * total amount of goals for the season
+ * total amount of goals scored against them for the season */
 typedef struct team {
     char name[3];
     int points, goals_scored, goals_scored_against;
 } Team;
 
+/* Singlylinked list struct which contains a pointer to a team struct and a pointer to the next node
+ * This is used to chain collisions in my hash table*/
 typedef struct list {
     Team* team;
     struct list* next;
 } List;
 
+/*prototype declarations*/
 void read_stats(Match* matches, List* teams);
 void print_match(Match* match);
 void print_team(Team* team);
 void evaluate_match(Match* match, List* teams);
-Team* lookup(Team* teams, char* team_name);
+/*Team* lookup(Team* teams, char* team_name);*/
 int hash(char* str);
-Team* list_lookup(List* teams, char* team_name);
+Team* lookup(List* teams, char* team_name);
 List* insert(List* last, char* team_name);
+void print_results(List* teams); 
+Team* hash_table_to_array(List* teams);
+int compare_teams(const void* team1, const void* team2);
 
 int main(void) {
     Match matches[NUMBER_OF_MATCHES];
-    Team teams[NUMBER_OF_TEAMS];
-    List list_teams[NUMBER_OF_TEAMS];
+    /*Team teams[NUMBER_OF_TEAMS];*/
+    List teams[NUMBER_OF_TEAMS];
     int i;
 
+    /*assign all the pointers for the next nodes to NULL
+     * this is the indicator that there isn't a team in that node yet*/
     for (i = 0; i < NUMBER_OF_TEAMS; i++) {
-        list_teams[i].next = NULL;
-        teams[i].name[0] = '\0';
+        teams[i].next = NULL;
+        /*teams[i].name[0] = '\0';*/
     }
 
-    read_stats(matches, list_teams);
+    /*parse the input into my array of matches as well as teams into my hash table of teams*/
+    read_stats(matches, teams);
 
     /*for (i = 0; i < NUMBER_OF_TEAMS; i++) {
         [>int h = 0;
@@ -97,13 +84,9 @@ int main(void) {
         }<]<]
         print_team((teams + i));
     }*/
-    for (i = 0; i < NUMBER_OF_TEAMS; i++) {
-        List* p = list_teams + i;
-        while(p->next != NULL) {
-            print_team(p->team);
-            p = p->next;
-        }
-    }
+
+    /*print the sorted results*/
+    print_results(teams);
 
     return 0;
 }
@@ -134,7 +117,7 @@ void print_match(Match* match) {
 }
 
 void print_team(Team* team) {
-    printf("%4s %4d %4d %4d\n",
+    printf("%-7s|%7d|%7d|%7d|\n",
             team->name,
             team->points,
             team->goals_scored,
@@ -142,8 +125,8 @@ void print_team(Team* team) {
 }
 
 void evaluate_match(Match* match, List* teams) {
-    Team* home_team = list_lookup(teams, match->home_team);
-    Team* away_team = list_lookup(teams, match->away_team);
+    Team* home_team = lookup(teams, match->home_team);
+    Team* away_team = lookup(teams, match->away_team);
 
     home_team->goals_scored += match->home_team_goals;
     home_team->goals_scored_against += match->away_team_goals;
@@ -161,7 +144,7 @@ void evaluate_match(Match* match, List* teams) {
     }
 }
 
-Team* lookup(Team* teams, char* team_name) {
+/*Team* lookup(Team* teams, char* team_name) {
     int index = hash(team_name);
 
     while (*((teams + index)->name) != '\0') {
@@ -177,9 +160,9 @@ Team* lookup(Team* teams, char* team_name) {
     (teams + index)->goals_scored_against = 0;
     (teams + index)->points = 0;
     return (teams + index);
-}
+}*/
 
-Team* list_lookup(List* teams, char* team_name) {
+Team* lookup(List* teams, char* team_name) {
     int index = hash(team_name);
     List* chain = (teams + index);
 
@@ -220,4 +203,45 @@ List* insert(List* last, char* team_name) {
     next_node->team = NULL;*/
 
     return last->next;
+}
+
+void print_results(List* teams) {
+    int i;
+    Team* team_array = hash_table_to_array(teams);
+    qsort(team_array, NUMBER_OF_TEAMS, sizeof(Team), compare_teams);
+    printf("%-8s%-8s%-8s%-8s\n", "Team:", "Points;", "Goals:", "Against:");
+    for (i = 0; i < NUMBER_OF_TEAMS; i++) {
+        print_team(team_array + i);
+    }
+
+    free(team_array);
+}
+
+Team* hash_table_to_array(List* teams) {
+    Team* team_array = (Team*) malloc(sizeof(Team) * NUMBER_OF_TEAMS);
+    int j = 0,
+        i;
+    for (i = 0; i < NUMBER_OF_TEAMS; i++) {
+        List* list_pointer = teams + i;
+        while(list_pointer->next != NULL) {
+            team_array[j] = *(list_pointer->team);
+            j++;
+            list_pointer = list_pointer->next;
+        }
+    }
+    return team_array;
+}
+
+int compare_teams(const void* team1, const void* team2) {
+    const Team* t1 = (const Team*) team1;
+    const Team* t2 = (const Team*) team2;
+    if (t1->points < t2->points) {
+        return 1; 
+    } else if (t1->points > t2->points) {
+        return -1;
+    } else if (t1->goals_scored - t1->goals_scored_against < t2->goals_scored - t2->goals_scored_against) {
+        return 1;
+    } else {
+        return -1;
+    }
 }
