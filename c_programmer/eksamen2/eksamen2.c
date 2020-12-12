@@ -3,10 +3,6 @@
  * Gruppe: A306
  * Studieretning: Datalogi */
 
-/* i had some trouble emptying stdin i tried looking for the EOF but didn't realize that newline is the character \n so so i would never reach it. 
- * I found a solution on https://www.thecodingforums.com/threads/peek-at-stdin-flush-stdin.318260/ which is very sumilar to what i did originally but know i also look for newlines.
- * I have modified the solution a bit, but the response function is highly inspired by that solution.*/
-
 /*the program follows this scoreboard https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fimages1.fanpop.com%2Fimages%2Fphotos%2F1300000%2FYahtzee-board-games-1319734-825-955.jpg&f=1&nofb=1 */
 
 #include <stdlib.h>
@@ -55,7 +51,7 @@ int response(void) {
     
     /*get user input and throw away the rest*/
     printf("Do you want to play again (y/n); ");
-    answer = getchar(); 
+    answer = getc(stdin); 
     empty_stdin();
     
     /*check the answer and act accordingly*/
@@ -74,24 +70,19 @@ int response(void) {
     return res;
 }
 
-/* empties stdin for extra character that can affect the next user inputs */
+/* empties stdin for extra characters that can affect the next user inputs */
 void empty_stdin(void) {
-    char c = getchar();
-
-    /* until a newline charactor or EOF is reached keeping reading characters from stdin */
-    while (c != '\n' && c != EOF) {
-        c = getchar();
-    }
+    while(getc(stdin) != '\n');
 }
 
 /* main function for the yatzy program */
 void yatzy(void) {
     int n_dice = 0,                     /*number of dice*/
-        scoreboard_size = chance + 1,   /*size of the scoreboard*/
         upper_score,                    /*total score for the upper section*/ 
         lower_score;                    /*total score for the lower section*/
-    int scoreboard[scoreboard_size],    /*array for all the scores on the scoreboard*/
-        dice_counter[6];                /*array that keeps track of how many there are of each die*/
+    int scoreboard[chance + 1],         /*array for all the scores on the scoreboard*/
+        dice_counter[6],                /*array that keeps track of how many there are of each die*/
+        *dice;                          /*array with dice rolls*/
     
     /* get an input greater than or equal to 5 */
     do {
@@ -100,9 +91,10 @@ void yatzy(void) {
     } while (n_dice < 5);
 
     empty_stdin();
+
+    /*allocate memory for the dice array*/
+    dice = (int*) malloc(sizeof(int) * n_dice);
     
-    /* array with dice rolls */
-    int dice[n_dice];     
 
     /*do calculate all the rolls and scores*/
     upper_score = upper_section(dice, n_dice, dice_counter, scoreboard);
@@ -110,6 +102,8 @@ void yatzy(void) {
 
     /*print the scoreboard*/
     print_scoreboard(scoreboard, upper_score, lower_score);
+
+    free(dice);
 }
 
 /* return a number from 1 to 6 */

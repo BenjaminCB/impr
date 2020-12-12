@@ -1,2 +1,4 @@
 - could use getchar function until EOF to make sure that stdin is empty. This way you won't have overflow from the last input over to the next one.
 - implement response() from eksamen 2
+- still no way to emyty stdin
+- you might be able to get an opereration from the last calculation through by not enter a valid char
