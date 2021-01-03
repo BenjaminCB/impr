@@ -4,3 +4,10 @@
 - c90 forbids variable lenght arrays like dice[n_dice]
 - personally i like having loop variables right before the loop but i have tried to follow pedantic rules c90 so for the most part every variable is at the top of the block
 - should use malloc to initalize dice array
+
+- is EOF case even neccesary in response function
+- n_dice only needs to be declared instead of initalized
+- instead of having roll_print_count calling three functions that each go throuh n_dice i could probably combine them down into one for loop instead three there reducing the time complexity a lot espacially since n_dice can get quite big however printing might as well be the bottleneck
+- using rolls enum in the counting function could be a little confusing
+- could probably use a single print in print_scoreboard
+- after callig full_house function forget to add to the sum afterwards
