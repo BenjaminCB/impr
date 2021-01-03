@@ -1,1 +1,6 @@
 - need to close the file but i am to lazy to fix it. 
+- a normal modulo hash table might be faster in this scenario because the array size is so small, but i got more out of implementing a chained linked list
+- forgot to remove comment on line 78
+- could probably have gotten around the arrow notation and gotten something that looks a little nicer
+- in insert function should rename last to tail
+- might want to free List* teams as well
