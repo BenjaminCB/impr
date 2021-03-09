@@ -18,7 +18,9 @@ struct date {
 typedef struct date date;
 
 /* Funktion prototypes */
-
+for (i=0; i<10; i++) {
+    
+}
 int leapYear(int);
 int date_before(date, date);
 weekday next_day_of(weekday);
